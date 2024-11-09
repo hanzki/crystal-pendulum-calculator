@@ -21,17 +21,17 @@ trying to see the future with the crystal pendulum
 3. For each ritual candle choice check how many combinations could match it and from that calculate the probability
 4. Calculate total possibility to win the check
 
-## How to handle Olivia and Jacqueline
+## How to handle Olive and Jacqueline
 * Alone both are easy.
-    * For Olivia pick 4 and choose any two.
+    * For Olive pick 4 and choose any two.
     * For Jacqueline pick 3 and choose any 1 or if tentacles was drawn choose the two others.
-* When used together need to choose the order. Either Olivia first or Jacqueline first.
-* Olivia first:
+* When used together need to choose the order. Either Olive first or Jacqueline first.
+* Olive first:
     * Reveal 3 normally.
     * For last reveal 3 and pick 1 (or 2 if tentacles would get cancelled)
-    * With olivia then choose two (if I understood correctly, if Jacqueline resulted into 2 tokens olivia cannot split them)
+    * With olive then choose two (if I understood correctly, if Jacqueline resulted into 2 tokens olive cannot split them)
 * Jacqueline first:
     * Reveal 2 normally.
     * for last reveal instead 4 and pick any 2.
-    * now for Jacqueline need to cancel two of revealed tokens, but if cancelling the olivia tokens they need to be cancelled or resolved both.
-* Feels that the Olivia first option is better
+    * now for Jacqueline need to cancel two of revealed tokens, but if cancelling the olive tokens they need to be cancelled or resolved both.
+* Feels that the Olive first option is better
