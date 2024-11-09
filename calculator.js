@@ -269,7 +269,6 @@ function calculateProbabilities() {
             allTokens.push(...jacquelineTokens);
         }
         var numberOfCombinations = allTokens.length;
-        console.log(allTokens);
 
         for (var tokens of allTokens) {
             var possibilities = possibilitiesWithOliveAndJacqueline(tokens);
@@ -284,10 +283,23 @@ function calculateProbabilities() {
         }
     }
 
-    console.log(`Number of combinations: ${numberOfCombinations}`);
-
     return {
         winning: winningPossibilities / numberOfCombinations,
         predictions: fulfillsPredictions.map(x => x / numberOfCombinations)
     };
+}
+
+// function to calculate the default value of a single token draw
+function calculateDefault() {
+    var tokenPossibilities = combinations(CHAOS_BAG, 1);
+    var sumOfModifiers = 0;
+
+    for (var tokens of tokenPossibilities) {
+        if(tokens[0] === "tentacles") {
+            continue;
+        }
+        sumOfModifiers += MODIFIERS[tokens[0]];
+    }
+
+    return sumOfModifiers / tokenPossibilities.length;
 }

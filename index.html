@@ -1,2 +1,121 @@
-<script src="calculator.js"></script>
-<h1>Hello!</h1>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="calculator.js"></script>
+    <title>Jacqueline's little helper</title>
+</head>
+<body>
+    <main class="container">
+        <h1 x-data="{ message: 'I ❤️ Alpine' }" x-text="message"></h1>
+        <div x-data="{
+            skill: 5,
+            difficulty: 3,
+            olive: false,
+            jacqueline: false,
+            result: 0,
+            chaosBag: {
+                tentacles: {
+                    count: 1,
+                    modifier: undefined,
+                },
+                star: {
+                    count: 1,
+                    modifier: 1,
+                },
+                tablet: {
+                    count: 1,
+                    modifier: -2,
+                },
+                cultist: {
+                    count: 1,
+                    modifier: -1,
+                },
+                skull: {
+                    count: 2,
+                    modifier: -1,
+                },
+                minus_four: {
+                    count: 1,
+                    modifier: -4,
+                },
+                minus_three: {
+                    count: 1,
+                    modifier: -3,
+                },
+                minus_two: {
+                    count: 2,
+                    modifier: -2,
+                },
+                minus_one: {
+                    count: 3,
+                    modifier: -1,
+                },
+                zero: {
+                    count: 2,
+                    modifier: 0,
+                },
+                plus_one: {
+                    count: 1,
+                    modifier: 1,
+                }
+            },
+            calculate() {
+                SKILL = this.skill;
+                DIFFICULTY = this.difficulty;
+                JACQUELINE_ENABLED = this.jacqueline;
+                OLIVE_ENABLED = this.olive;
+                this.result = calculateProbabilities().winning;
+            },
+            updateChaosBag() {
+                Object.keys(this.chaosBag).foreach(key => {
+                    CHAOS_BAG[key] = this.chaosBag[key].count;
+                    if (key !== 'tentacles') {
+                        MODIFIERS[key] = this.chaosBag[key].modifier;
+                    }
+                });
+            },
+            get prettyResult() {
+                return (this.result * 100).toFixed(2) + '%'; 
+            },
+            get defaultValue() {
+                return calculateDefault();
+            },
+        }">
+            <h2>Skill = <span x-text="skill"/></h2>
+            <label>
+                Skill
+                <input x-model="skill" type="range" max="15"/>
+            </label>
+            <h2 >Difficulty = <span x-text="difficulty"/></h2>
+            <label>
+                Difficulty
+                <input x-model="difficulty" type="range" max="15"/>
+            </label>
+            <fieldset>
+                <label>
+                    <input x-model="jacqueline" name="jacueline" type="checkbox" role="switch" />
+                    Use Jacqueline
+                </label>
+                <label>
+                    <input x-model="olive" name="olive" type="checkbox" role="switch" checked />
+                    Use Olive
+                </label>
+            </fieldset>
+            <details>
+                <summary>Chaos Bag <span x-text="defaultValue"></span></summary>
+                <ul>
+                    <li>...</li>
+                    <li>...</li>
+                </ul>
+            </details>
+            <button @click="calculate()">Calculate</button>
+            <h2 x-show="result > 0">Result = <span x-text="prettyResult"/></h2>
+        </div>
+        
+    </main>
+</body>
+</html>
