@@ -1,7 +1,37 @@
 function calculatorComponent() {
 
+    let chart;
+
+    const initialCrystalPendulumChart =  {
+        type: 'bar',
+        data: {
+        labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+        datasets: [{
+            label: 'Probability',
+            data: [],
+            borderWidth: 1
+        }]
+        },
+        options: {
+            scales: {
+                y: {
+                beginAtZero: true,
+                max: 1
+                }
+            }
+        }
+    };
+
+    const setChartData = (probabilities) => {
+        chart.data.datasets[0].data = probabilities.predictions;
+        chart.update();
+    };
+
     return {
         isLoading: false,
+        init() {
+            chart = new Chart(this.$refs.chart, initialCrystalPendulumChart);
+        },
         skill: 5,
         difficulty: 3,
         olive: false,
@@ -14,6 +44,7 @@ function calculatorComponent() {
             JACQUELINE_ENABLED = this.jacqueline;
             OLIVE_ENABLED = this.olive;
             this.result = calculateProbabilities(this.chaosBag);
+            setChartData(this.result);
         },
         updateChaosBag() {
             Object.keys(this.chaosBag).foreach(key => {

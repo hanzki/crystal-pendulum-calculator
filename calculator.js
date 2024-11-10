@@ -139,7 +139,7 @@ function possibilitiesWithOliveAndJacqueline(tokens, modifiers) {
     }
 
     // calculate all possible modifiers with Jacqueline's token
-    var jacquelineModifiers = possibilitiesWithJacqueline(jacquelineTokens);
+    var jacquelineModifiers = possibilitiesWithJacqueline(jacquelineTokens, modifiers);
     for (var token of oliveTokens) {
         for (var jacquelineModifier of jacquelineModifiers) {
             var sum = modifiers[token] + jacquelineModifier;

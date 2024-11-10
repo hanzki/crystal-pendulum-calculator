@@ -5,6 +5,7 @@
     <meta name="color-scheme" content="light dark">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="calculator.js"></script>
     <script src="calculatorComponent.js"></script>
     <script src="chaosBag.js"></script>
@@ -95,7 +96,10 @@
                 </table>
             </details>
             <button @click="calculate()">Calculate</button>
-            <h2 x-show="typeof result !== 'undefined'">Result = <span x-text="prettyResult"/></h2>
+            <div x-show="typeof result !== 'undefined'">
+                <h2 >Result = <span x-text="prettyResult"/></h2>
+                <canvas x-ref="chart" id="chart" width="800" height="450"></canvas>
+            </div>
         </div>
         
     </main>
