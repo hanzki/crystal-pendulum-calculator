@@ -6,94 +6,27 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="calculator.js"></script>
+    <script src="calculatorComponent.js"></script>
+    <script src="chaosBag.js"></script>
     <title>Jacqueline's little helper</title>
+    <style>
+        #chaosBagDetails input{
+            --pico-line-height: 1;
+            --pico-spacing: 0;
+        }
+    </style>
 </head>
 <body>
     <main class="container">
-        <h1 x-data="{ message: 'I ❤️ Alpine' }" x-text="message"></h1>
-        <div x-data="{
-            skill: 5,
-            difficulty: 3,
-            olive: false,
-            jacqueline: false,
-            result: 0,
-            chaosBag: {
-                tentacles: {
-                    count: 1,
-                    modifier: undefined,
-                },
-                star: {
-                    count: 1,
-                    modifier: 1,
-                },
-                tablet: {
-                    count: 1,
-                    modifier: -2,
-                },
-                cultist: {
-                    count: 1,
-                    modifier: -1,
-                },
-                skull: {
-                    count: 2,
-                    modifier: -1,
-                },
-                minus_four: {
-                    count: 1,
-                    modifier: -4,
-                },
-                minus_three: {
-                    count: 1,
-                    modifier: -3,
-                },
-                minus_two: {
-                    count: 2,
-                    modifier: -2,
-                },
-                minus_one: {
-                    count: 3,
-                    modifier: -1,
-                },
-                zero: {
-                    count: 2,
-                    modifier: 0,
-                },
-                plus_one: {
-                    count: 1,
-                    modifier: 1,
-                }
-            },
-            calculate() {
-                SKILL = this.skill;
-                DIFFICULTY = this.difficulty;
-                JACQUELINE_ENABLED = this.jacqueline;
-                OLIVE_ENABLED = this.olive;
-                this.result = calculateProbabilities().winning;
-            },
-            updateChaosBag() {
-                Object.keys(this.chaosBag).foreach(key => {
-                    CHAOS_BAG[key] = this.chaosBag[key].count;
-                    if (key !== 'tentacles') {
-                        MODIFIERS[key] = this.chaosBag[key].modifier;
-                    }
-                });
-            },
-            get prettyResult() {
-                return (this.result * 100).toFixed(2) + '%'; 
-            },
-            get defaultValue() {
-                return calculateDefault();
-            },
-        }">
-            <h2>Skill = <span x-text="skill"/></h2>
+        <h1>Jacqueline's little helper</h1>
+        <div x-data="calculatorComponent()">
             <label>
-                Skill
-                <input x-model="skill" type="range" max="15"/>
+                Skill = <span x-text="skill"></span>
+                <input x-model.number="skill" type="range" max="15"/>
             </label>
-            <h2 >Difficulty = <span x-text="difficulty"/></h2>
             <label>
-                Difficulty
-                <input x-model="difficulty" type="range" max="15"/>
+                Difficulty = <span x-text="difficulty"></span>
+                <input x-model.number="difficulty" type="range" max="15"/>
             </label>
             <fieldset>
                 <label>
@@ -101,19 +34,67 @@
                     Use Jacqueline
                 </label>
                 <label>
-                    <input x-model="olive" name="olive" type="checkbox" role="switch" checked />
+                    <input x-model="olive" name="olive" type="checkbox" role="switch" />
                     Use Olive
                 </label>
+                <label>
+                    <input name="darkFuture" type="checkbox" role="switch" disabled/>
+                    Dark Future active
+                </label>
+
             </fieldset>
-            <details>
-                <summary>Chaos Bag <span x-text="defaultValue"></span></summary>
-                <ul>
-                    <li>...</li>
-                    <li>...</li>
-                </ul>
+            <fieldset>
+                <legend>Ritual Candles</legend>
+                <input type="radio" id="candles_zero" name="ritualCandles" checked />
+                <label htmlFor="candles_zero">0</label>
+                <input type="radio" id="candles_one" name="ritualCandles" disabled/>
+                <label htmlFor="candles_one">1</label>
+                <input type="radio" id="candles_two" name="ritualCandles" disabled/>
+                <label htmlFor="candles_two">2</label>
+            </fieldset>
+            <details id="chaosBagDetails">
+                <summary>Chaos Bag (<span x-text="chaosBag.numberOfTokens"></span>pcs / <span x-text="chaosBag.defaultValue"></span>)</summary>
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Token</th>
+                            <th scope="col">Modifier</th>
+                            <th scope="col">Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template x-for="(value, token) in chaosBag.tokens" :key="token">
+                            <tr>
+                                <th scope="row" x-text="token"></th>
+                                <td x-show="isTentacles(token)">fail</td>
+                                <td x-show="isNumber(token)" x-text="value.modifier"></td>
+                                <td x-show="!isTentacles(token) && isSymbol(token)">
+                                    <input x-model.number="value.modifier" type="number" min="-10" max="10"/>
+                                </td>
+                                <td>
+                                    <input x-model.number="value.count" type="number" min="0" />
+                                </td>
+                            </tr>
+                        </template>
+                        <tr>
+                            <th scope="row">Bless</th>
+                            <td>2</td>
+                            <td>
+                                <input type="number" disabled value="0"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Curse</th>
+                            <td>-2</td>
+                            <td>
+                                <input type="number" disabled value="0"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </details>
             <button @click="calculate()">Calculate</button>
-            <h2 x-show="result > 0">Result = <span x-text="prettyResult"/></h2>
+            <h2 x-show="typeof result !== 'undefined'">Result = <span x-text="prettyResult"/></h2>
         </div>
         
     </main>
