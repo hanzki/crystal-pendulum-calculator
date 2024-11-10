@@ -1,0 +1,21 @@
+/* Light color scheme (Default) */
+/* Can be forced with data-theme="light" */
+[data-theme="light"],
+:root:not([data-theme="dark"]) {
+    background: rgb(23,21,59);
+    background: linear-gradient(180deg, rgba(23,21,59,1) 0%, rgba(46,35,108,1) 50%, rgba(67,61,139,1) 100%);
+    --pico-background-color: rgb(98, 50, 130);
+    --pico-muted-border-color: rgb(121, 62, 161);
+    --pico-color: rgb(200, 172, 214);
+    --pico-muted-color: rgb(132, 105, 145);
+    --pico-h1-color: rgb(200, 172, 214);
+    --pico-h2-color: rgb(200, 172, 214);
+    --pico-text-selection-color: rgba(93, 7, 136, 0.25);
+    --pico-primary: rgb(141, 20, 201);
+    --pico-primary-background: #a017d2;
+    --pico-primary-underline: rgba(169, 19, 189, 0.5);
+    --pico-primary-hover: #9629c2;
+    --pico-primary-hover-background: #8a13bd;
+    --pico-primary-focus: rgba(157, 44, 244, 0.5);
+    --pico-primary-inverse: #fff;
+}
