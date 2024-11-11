@@ -7,23 +7,30 @@ function calculatorComponent() {
         data: {
         labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
         datasets: [{
-            label: 'Crystal Pendulum probability',
+            label: 'Probability to fulfill',
             data: [],
-            borderWidth: 1
+            borderWidth: 1,
+            backgroundColor: '#8a508f',
+        },{
+            label: 'Probability to fulfill and win',
+            data: [],
+            borderWidth: 1,
+            backgroundColor: '#558f50',
         }]
         },
         options: {
             scales: {
                 y: {
                     beginAtZero: true,
-                    max: 100
-                }
+                    max: 100,
+                },
             }
         }
     };
 
     const updateChart = (probabilities) => {
         chart.data.datasets[0].data = probabilities.predictions.map(p => (p * 100).toFixed(0));
+        chart.data.datasets[1].data = probabilities.predictionsAndWins.map(p => (p * 100).toFixed(0));
         chart.update();
     };
 

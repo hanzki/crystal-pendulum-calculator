@@ -144,17 +144,24 @@ function hasWinningPossibility(config, possibilities) {
 
 // function to check if the possibilities can fulfill the given crystal pendulum prediction
 function canFulfillPrediction(config, possibilities, prediction) {
+    let canFulfill = false;
+
     for (const possibility of possibilities) {
         if (Math.abs(possibility + config.skill - config.difficulty) === prediction) {
-            return true;
+            if(possibility + config.skill - config.difficulty >= 0) {
+                return {fulfill: true, positive: true};
+            } else {
+                canFulfill = true;
+            }
         }
     }
-    return false;
+    return {fulfill: canFulfill, positive: false};
 }
 
 function calculateProbabilities(config, bag) {
     let winningPossibilities = 0;
     const fulfillsPredictions = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    const fulfillsAndWinsPredictions = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     let numberOfCombinations = 0;
 
     const allTokens = bag.listOfTokens;
@@ -165,8 +172,8 @@ function calculateProbabilities(config, bag) {
         return acc;
     }, {});
 
-    console.log(`Calculating probabilities... Config: ${JSON.stringify(config)}`);
-    console.log({allTokens, modifiers});
+    console.debug(`Calculating probabilities... Config: ${JSON.stringify(config)}`);
+    console.debug({allTokens, modifiers});
 
     if (!config.jacqueline && !config.olive) {
         // draw one token
@@ -182,8 +189,12 @@ function calculateProbabilities(config, bag) {
                 winningPossibilities++;
             }
             for (let i = 0; i < fulfillsPredictions.length; i++) {
-                if (canFulfillPrediction(config, possibilities, i)) {
+                const {fulfill, positive} = canFulfillPrediction(config, possibilities, i);
+                if (fulfill) {
                     fulfillsPredictions[i]++;
+                }
+                if (positive) {
+                    fulfillsAndWinsPredictions[i]++;
                 }
             }
         }
@@ -200,8 +211,12 @@ function calculateProbabilities(config, bag) {
                 winningPossibilities++;
             }
             for (let i = 0; i < fulfillsPredictions.length; i++) {
-                if (canFulfillPrediction(config, possibilities, i)) {
+                const {fulfill, positive} = canFulfillPrediction(config, possibilities, i);
+                if (fulfill) {
                     fulfillsPredictions[i]++;
+                }
+                if (positive) {
+                    fulfillsAndWinsPredictions[i]++;
                 }
             }
         }
@@ -218,8 +233,12 @@ function calculateProbabilities(config, bag) {
                 winningPossibilities++;
             }
             for (let i = 0; i < fulfillsPredictions.length; i++) {
-                if (canFulfillPrediction(config, possibilities, i)) {
+                const {fulfill, positive} = canFulfillPrediction(config, possibilities, i);
+                if (fulfill) {
                     fulfillsPredictions[i]++;
+                }
+                if (positive) {
+                    fulfillsAndWinsPredictions[i]++;
                 }
             }
         }
@@ -244,8 +263,12 @@ function calculateProbabilities(config, bag) {
                 winningPossibilities++;
             }
             for (let i = 0; i < fulfillsPredictions.length; i++) {
-                if (canFulfillPrediction(config, possibilities, i)) {
+                const {fulfill, positive} = canFulfillPrediction(config, possibilities, i);
+                if (fulfill) {
                     fulfillsPredictions[i]++;
+                }
+                if (positive) {
+                    fulfillsAndWinsPredictions[i]++;
                 }
             }
         }
@@ -253,6 +276,7 @@ function calculateProbabilities(config, bag) {
 
     return {
         winning: winningPossibilities / numberOfCombinations,
-        predictions: fulfillsPredictions.map(x => x / numberOfCombinations)
+        predictions: fulfillsPredictions.map(x => x / numberOfCombinations),
+        predictionsAndWins: fulfillsAndWinsPredictions.map(x => x / numberOfCombinations)
     };
 }
