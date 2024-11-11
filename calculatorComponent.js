@@ -35,7 +35,7 @@ function calculatorComponent() {
         config: {
             skill: 5,
             difficulty: 3,
-            olive: false,
+            olive: true,
             jacqueline: true,
             candles: 0,
         },

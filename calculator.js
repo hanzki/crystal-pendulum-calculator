@@ -1,26 +1,10 @@
-// function to remove tokens from the bag
-function removeFromBag(bag, tokens) {
-    const newBag = Object.assign({}, bag);
-    for (const token of tokens) {
-        newBag[token]--;
-        if (newBag[token] === 0) {
-            delete newBag[token];
-        }
+// function to remove tokens from tokens array
+function removeTokens(tokens, tokensToRemove) {
+    const newTokens = tokens.slice();
+    for (const token of tokensToRemove) {
+        newTokens.splice(newTokens.indexOf(token), 1);
     }
-    return newBag;
-}
-
-// converts array of tokens into a bag format
-function tokensToBag(tokens) {
-    const bag = {};
-    for (const token of tokens) {
-        if (bag[token] === undefined) {
-            bag[token] = 1;
-        } else {
-            bag[token]++;
-        }
-    }
-    return bag;
+    return newTokens;
 }
 
 // function to calculate all possible modifiers after using candles
@@ -75,7 +59,7 @@ function possibilitiesWithOlive(tokens, modifiers, candles) {
 
     // calculate all possible modifiers for each pair of tokens
     const possibleModifiers = [];
-    const tokenCombinations = combinations(tokensToBag(tokens), 2);
+    const tokenCombinations = combinations(tokens, 2);
     for (const tokens of tokenCombinations) {
         let sum = 0;
         let numberOfSymbols = 0;
@@ -111,7 +95,7 @@ function possibilitiesWithOliveAndJacqueline(tokens, modifiers, candles) {
     const possibleModifiers = [];
 
     // calculate all possible modifiers without Jacqueline's token
-    const tokenCombinations = combinations(tokensToBag(oliveTokens), 2);
+    const tokenCombinations = combinations(oliveTokens, 2);
     for (const tokens of tokenCombinations) {
         let sum = 0;
         let numberOfSymbols = 0;
@@ -173,10 +157,7 @@ function calculateProbabilities(config, bag) {
     const fulfillsPredictions = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     let numberOfCombinations = 0;
 
-    const allTokens = Object.keys(bag.tokens).reduce((acc, key) => {
-        acc[key] = bag.tokens[key].count;
-        return acc;
-    }, {});
+    const allTokens = bag.listOfTokens;
     const modifiers = Object.keys(bag.tokens).reduce((acc, key) => {
         if (key !== 'tentacles') {
             acc[key] = bag.tokens[key].modifier;
@@ -251,8 +232,8 @@ function calculateProbabilities(config, bag) {
         const oliveAndJacquelineTokens = [];
         for (const oliveTokens of oliveTokenCombinations) {
             // then draw three tokens with Jacqueline
-            const newBag = removeFromBag(allTokens, oliveTokens);
-            const jacquelineTokens = combinations(newBag, 3, oliveTokens);
+            const tokensWithoutOliveTokens = removeTokens(allTokens, oliveTokens);
+            const jacquelineTokens = combinations(tokensWithoutOliveTokens, 3, oliveTokens);
             oliveAndJacquelineTokens.push(...jacquelineTokens);
         }
         numberOfCombinations = oliveAndJacquelineTokens.length;

@@ -45,35 +45,38 @@ const DEFAULT_TOKENS = {
     }
 };
 
-// Function to calculate all possible sets of tokens of size n that can be drawn from the given tokens
 function combinations(tokens, n, prior = []) {
-    if (n === 0) {
-        return [prior];
-    }
+    console.assert(n > 0 && n <= 6, "n must be between 1 and 6");
 
-    // sum of tokens to choose from
-    var sum = 0;
-    for (var key in tokens) {
-        sum += tokens[key];
+    switch (n) {
+        case 1:
+            return tokens.map(t => [...prior, t]);
+        case 2:
+            return tokens.flatMap((t1, i1) => (
+                tokens.slice(i1 + 1).map(t2 => [...prior, t1, t2])));
+        case 3:
+            return tokens.flatMap((t1, i1) => (
+                tokens.slice(i1 + 1).flatMap((t2, i2) => (
+                    tokens.slice(i1 + i2 + 2).map(t3 => [...prior, t1, t2, t3])))));
+        case 4:
+            return tokens.flatMap((t1, i1) => (
+                tokens.slice(i1 + 1).flatMap((t2, i2) => (
+                    tokens.slice(i1 + i2 + 2).flatMap((t3, i3) => (
+                        tokens.slice(i1 + i2 + i3 + 3).map(t4 => [...prior, t1, t2, t3, t4])))))));
+        case 5:
+            return tokens.flatMap((t1, i1) => (
+                tokens.slice(i1 + 1).flatMap((t2, i2) => (
+                    tokens.slice(i1 + i2 + 2).flatMap((t3, i3) => (
+                        tokens.slice(i1 + i2 + i3 + 3).flatMap((t4, i4) => (
+                            tokens.slice(i1 + i2 + i3 + i4 + 4).map(t5 => [...prior, t1, t2, t3, t4, t5])))))))));
+        case 6:
+            return tokens.flatMap((t1, i1) => (
+                tokens.slice(i1 + 1).flatMap((t2, i2) => (
+                    tokens.slice(i1 + i2 + 2).flatMap((t3, i3) => (
+                        tokens.slice(i1 + i2 + i3 + 3).flatMap((t4, i4) => (
+                            tokens.slice(i1 + i2 + i3 + i4 + 4).flatMap((t5, i5) => (
+                                tokens.slice(i1 + i2 + i3 + i4 + i5 + 5).map(t6 => [...prior, t1, t2, t3, t4, t5, t6])))))))))));
     }
-    if(sum < n) {
-        return [];
-    }
-
-    var key = Object.keys(tokens)[0];
-    var newTokens = Object.assign({}, tokens);
-    newTokens[key]--;
-    if (newTokens[key] === 0) {
-        delete newTokens[key];
-    }
-    // copy prior array
-    newPrior = prior.slice();
-
-    // pick the token
-    var result = combinations(newTokens, n - 1, newPrior.concat([key]));
-    // don't pick the token
-    result = result.concat(combinations(newTokens, n, prior));
-    return result;
 }
 
 function isTentacles(token) {
@@ -93,12 +96,13 @@ class ChaosBag {
         this.tokens = structuredClone(DEFAULT_TOKENS);
     }
 
-    combinations(n) {
-        const allTokens = Object.keys(this.tokens).reduce((acc, key) => {
-            acc[key] = this.tokens[key].count;
+    get listOfTokens() {
+        return Object.keys(this.tokens).reduce((acc, key) => {
+            for (let i = 0; i < this.tokens[key].count; i++) {
+                acc.push(key);
+            }
             return acc;
-        }, {});
-        return combinations(allTokens, n);
+        }, []);
     }
 
     get numberOfTokens() {
@@ -108,7 +112,7 @@ class ChaosBag {
     }
 
     get defaultValue() {
-        var tokenPossibilities = this.combinations(1);
+        var tokenPossibilities = combinations(this.listOfTokens, 1);
         var sumOfModifiers = 0;
 
         for (var token of tokenPossibilities) {
