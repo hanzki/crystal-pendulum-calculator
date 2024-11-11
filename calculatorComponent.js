@@ -7,7 +7,7 @@ function calculatorComponent() {
         data: {
         labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
         datasets: [{
-            label: 'Probability',
+            label: 'Crystal Pendulum probability',
             data: [],
             borderWidth: 1
         }]
@@ -15,15 +15,15 @@ function calculatorComponent() {
         options: {
             scales: {
                 y: {
-                beginAtZero: true,
-                max: 1
+                    beginAtZero: true,
+                    max: 100
                 }
             }
         }
     };
 
     const updateChart = (probabilities) => {
-        chart.data.datasets[0].data = probabilities.predictions;
+        chart.data.datasets[0].data = probabilities.predictions.map(p => (p * 100).toFixed(0));
         chart.update();
     };
 
@@ -35,7 +35,7 @@ function calculatorComponent() {
         config: {
             skill: 5,
             difficulty: 3,
-            olive: true,
+            olive: false,
             jacqueline: true,
             candles: 0,
         },

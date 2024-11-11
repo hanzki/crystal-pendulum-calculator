@@ -22,6 +22,7 @@
     <main class="container">
         <h1>Jacqueline's little helper</h1>
         <div x-data="calculatorComponent()">
+            <form @submit.prevent="calculate()">
             <label>
                 Skill = <span x-text="config.skill"></span>
                 <input x-model.number="config.skill" type="range" max="15"/>
@@ -95,9 +96,10 @@
                     </tbody>
                 </table>
             </details>
-            <button @click="calculate()">Calculate</button>
+            <button>Calculate</button>
+        </form>
             <div x-show="typeof result !== 'undefined'">
-                <h2 >Result = <span x-text="prettyResult"/></h2>
+                <h2 >Win probability <span x-text="prettyResult"/></h2>
                 <canvas x-ref="chart" id="chart" width="800" height="450"></canvas>
             </div>
         </div>
