@@ -76,6 +76,18 @@ function combinations(tokens, n, prior = []) {
     return result;
 }
 
+function isTentacles(token) {
+    return token === 'tentacles';
+}
+
+function isSymbol(token) {
+    return ['tentacles','star','tablet','cultist','skull'].includes(token);
+}
+
+function isNumber(token) {
+    return ['minus_four','minus_three','minus_two','minus_one','zero','plus_one'].includes(token);
+}
+
 class ChaosBag {
     constructor() {
         this.tokens = structuredClone(DEFAULT_TOKENS);

@@ -1,8 +1,7 @@
 // function to remove tokens from the bag
 function removeFromBag(bag, tokens) {
-    var newBag = Object.assign({}, bag);
-    for (var i = 0; i < tokens.length; i++) {
-        var token = tokens[i];
+    const newBag = Object.assign({}, bag);
+    for (const token of tokens) {
         newBag[token]--;
         if (newBag[token] === 0) {
             delete newBag[token];
@@ -13,9 +12,8 @@ function removeFromBag(bag, tokens) {
 
 // converts array of tokens into a bag format
 function tokensToBag(tokens) {
-    var bag = {};
-    for (var i = 0; i < tokens.length; i++) {
-        var token = tokens[i];
+    const bag = {};
+    for (const token of tokens) {
         if (bag[token] === undefined) {
             bag[token] = 1;
         } else {
@@ -25,32 +23,49 @@ function tokensToBag(tokens) {
     return bag;
 }
 
+// function to calculate all possible modifiers after using candles
+function possibilitiesWithCandles(originalModifier, numberOfSymbols, candles) {
+    const maxAdjustment = numberOfSymbols * candles;
+    const possibilities = [];
+    for ( let i = 0; i <= maxAdjustment; i++) {
+        possibilities.push(originalModifier + i);
+    }
+    return possibilities;
+}
+
 // function to calculate all possible modifiers after using Jacqueline's ability
-function possibilitiesWithJacqueline(tokens, modifiers) {
+function possibilitiesWithJacqueline(tokens, modifiers, candles) {
     // check if tokens has tentacles
     if (tokens.indexOf("tentacles") > -1) {
         // sum the modifier of the other tokens
-        var sum = 0;
-        for (var i = 0; i < tokens.length; i++) {
+        let sum = 0;
+        let numberOfSymbols = 0;
+        for (let i = 0; i < tokens.length; i++) {
             if (tokens[i] !== "tentacles") {
                 sum += modifiers[tokens[i]];
+                if (isSymbol(tokens[i])) {
+                    numberOfSymbols++;
+                }
             }
         }
-        return [sum];
+        return possibilitiesWithCandles(sum, numberOfSymbols, candles);
     }
 
-    var possibleModifiers = [];
-    for (var token of tokens) {
-        // check if the modifier already exists
-        if (possibleModifiers.indexOf(modifiers[token]) === -1) {
-            possibleModifiers.push(modifiers[token]);
+    const possibleModifiers = [];
+    for (let token of tokens) {
+        const possibleModifiersForToken = possibilitiesWithCandles(modifiers[token], isSymbol(token) ? 1 : 0, candles);
+        for (const modifier of possibleModifiersForToken) {
+            // check if the modifier already exists
+            if (possibleModifiers.indexOf(modifier) === -1) {
+                possibleModifiers.push(modifier);
+            }
         }
     }
     return possibleModifiers;
 }
 
 // function to calculate all possible modifiers after using Olive's ability
-function possibilitiesWithOlive(tokens, modifiers) {
+function possibilitiesWithOlive(tokens, modifiers, candles) {
     // check if tokens has tentacles
     if (tokens.indexOf("tentacles") > -1) {
         //remove tentacles from the tokens
@@ -59,15 +74,23 @@ function possibilitiesWithOlive(tokens, modifiers) {
     }
 
     // calculate all possible modifiers for each pair of tokens
-    var possibleModifiers = [];
-    var tokenCombinations = combinations(tokensToBag(tokens), 2);
-    for (var tokens of tokenCombinations) {
-        var sum = 0;
-        for (var token of tokens) {
+    const possibleModifiers = [];
+    const tokenCombinations = combinations(tokensToBag(tokens), 2);
+    for (const tokens of tokenCombinations) {
+        let sum = 0;
+        let numberOfSymbols = 0;
+        for (const token of tokens) {
             sum += modifiers[token];
+            if (isSymbol(token)) {
+                numberOfSymbols++;
+            }
         }
-        if (possibleModifiers.indexOf(sum) === -1) {
-            possibleModifiers.push(sum);
+        const possibilities = possibilitiesWithCandles(sum, numberOfSymbols, candles);
+        for (const possibility of possibilities) {
+            // add the possible modifiers to the list if it doesn't exist
+            if (possibleModifiers.indexOf(possibility) === -1) {
+                possibleModifiers.push(possibility);
+            }
         }
     }
     return possibleModifiers;
@@ -75,9 +98,9 @@ function possibilitiesWithOlive(tokens, modifiers) {
 
 // function to calculate all possible modifiers after using both Jacqueline's and Olive's abilities
 // first three tokens in the input are drawn with Olive and the last three with Jacqueline
-function possibilitiesWithOliveAndJacqueline(tokens, modifiers) {
-    var jacquelineTokens = tokens.slice(3);
-    var oliveTokens = tokens.slice(0, 3);
+function possibilitiesWithOliveAndJacqueline(tokens, modifiers, candles) {
+    const jacquelineTokens = tokens.slice(3);
+    const oliveTokens = tokens.slice(0, 3);
 
     // check if Olive tokens has tentacles
     if (oliveTokens.indexOf("tentacles") > -1) {
@@ -85,27 +108,40 @@ function possibilitiesWithOliveAndJacqueline(tokens, modifiers) {
         oliveTokens.splice(oliveTokens.indexOf("tentacles"), 1);
     }
 
-    var possibleModifiers = [];
+    const possibleModifiers = [];
 
     // calculate all possible modifiers without Jacqueline's token
-    var tokenCombinations = combinations(tokensToBag(oliveTokens), 2);
-    for (var tokens of tokenCombinations) {
-        var sum = 0;
-        for (var token of tokens) {
+    const tokenCombinations = combinations(tokensToBag(oliveTokens), 2);
+    for (const tokens of tokenCombinations) {
+        let sum = 0;
+        let numberOfSymbols = 0;
+        for (const token of tokens) {
             sum += modifiers[token];
+            if (isSymbol(token)) {
+                numberOfSymbols++;
+            }
         }
-        if (possibleModifiers.indexOf(sum) === -1) {
-            possibleModifiers.push(sum);
+        const possibilities = possibilitiesWithCandles(sum, numberOfSymbols, candles);
+        for (const possibility of possibilities) {
+            // add the possible modifiers to the list if it doesn't exist
+            if (possibleModifiers.indexOf(possibility) === -1) {
+                possibleModifiers.push(possibility);
+            }
         }
     }
 
     // calculate all possible modifiers with Jacqueline's token
-    var jacquelineModifiers = possibilitiesWithJacqueline(jacquelineTokens, modifiers);
-    for (var token of oliveTokens) {
-        for (var jacquelineModifier of jacquelineModifiers) {
-            var sum = modifiers[token] + jacquelineModifier;
-            if (possibleModifiers.indexOf(sum) === -1) {
-                possibleModifiers.push(sum);
+    const jacquelineModifiers = possibilitiesWithJacqueline(jacquelineTokens, modifiers, candles);
+    for (const token of oliveTokens) {
+        for (const jacquelineModifier of jacquelineModifiers) {
+            const sum = modifiers[token] + jacquelineModifier;
+            // candle adjustments are already included in the Jacqueline's modifier but we need to include them for Olive's token
+            const possibilities = possibilitiesWithCandles(sum, isSymbol(token) ? 1 : 0, candles);
+            for (const possibility of possibilities) {
+                // add the possible modifiers to the list if it doesn't exist
+                if (possibleModifiers.indexOf(possibility) === -1) {
+                    possibleModifiers.push(possibility);
+                }
             }
         }
     }
@@ -114,8 +150,8 @@ function possibilitiesWithOliveAndJacqueline(tokens, modifiers) {
 
 // function to check if there is a winning possibility in the given modifiers
 function hasWinningPossibility(config, possibilities) {
-    for (var i = 0; i < possibilities.length; i++) {
-        if (possibilities[i] + config.skill >= config.difficulty) {
+    for (const possibility of possibilities) {
+        if (possibility + config.skill >= config.difficulty) {
             return true;
         }
     }
@@ -124,8 +160,8 @@ function hasWinningPossibility(config, possibilities) {
 
 // function to check if the possibilities can fulfill the given crystal pendulum prediction
 function canFulfillPrediction(config, possibilities, prediction) {
-    for (var i = 0; i < possibilities.length; i++) {
-        if (Math.abs(possibilities[i] + config.skill - config.difficulty) === prediction) {
+    for (const possibility of possibilities) {
+        if (Math.abs(possibility + config.skill - config.difficulty) === prediction) {
             return true;
         }
     }
@@ -133,8 +169,9 @@ function canFulfillPrediction(config, possibilities, prediction) {
 }
 
 function calculateProbabilities(config, bag) {
-    var winningPossibilities = 0;
-    var fulfillsPredictions = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    let winningPossibilities = 0;
+    const fulfillsPredictions = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    let numberOfCombinations = 0;
 
     const allTokens = Object.keys(bag.tokens).reduce((acc, key) => {
         acc[key] = bag.tokens[key].count;
@@ -152,18 +189,18 @@ function calculateProbabilities(config, bag) {
 
     if (!config.jacqueline && !config.olive) {
         // draw one token
-        var tokenCombinations = combinations(allTokens, 1);
-        var numberOfCombinations = tokenCombinations.length;
+        const tokenCombinations = combinations(allTokens, 1);
+        numberOfCombinations = tokenCombinations.length;
 
-        for (var tokens of tokenCombinations) {
+        for (const tokens of tokenCombinations) {
             if(tokens[0] === "tentacles") {
                 continue;
             }
-            var possibilities = [modifiers[tokens[0]]];
+            const possibilities = possibilitiesWithCandles(modifiers[tokens[0]], isSymbol(tokens[0]) ? 1 : 0, config.candles);
             if (hasWinningPossibility(config, possibilities)) {
                 winningPossibilities++;
             }
-            for (var i = 0; i < fulfillsPredictions.length; i++) {
+            for (let i = 0; i < fulfillsPredictions.length; i++) {
                 if (canFulfillPrediction(config, possibilities, i)) {
                     fulfillsPredictions[i]++;
                 }
@@ -173,15 +210,15 @@ function calculateProbabilities(config, bag) {
 
     if (config.jacqueline && !config.olive) {
         // draw three tokens
-        var tokenCombinations = combinations(allTokens, 3);
-        var numberOfCombinations = tokenCombinations.length;
+        const tokenCombinations = combinations(allTokens, 3);
+        numberOfCombinations = tokenCombinations.length;
 
-        for (var tokens of tokenCombinations) {
-            var possibilities = possibilitiesWithJacqueline(tokens, modifiers);
+        for (const tokens of tokenCombinations) {
+            const possibilities = possibilitiesWithJacqueline(tokens, modifiers, config.candles);
             if (hasWinningPossibility(config, possibilities)) {
                 winningPossibilities++;
             }
-            for (var i = 0; i < fulfillsPredictions.length; i++) {
+            for (let i = 0; i < fulfillsPredictions.length; i++) {
                 if (canFulfillPrediction(config, possibilities, i)) {
                     fulfillsPredictions[i]++;
                 }
@@ -191,15 +228,15 @@ function calculateProbabilities(config, bag) {
 
     if (config.olive && !config.jacqueline) {
         // draw four tokens
-        var tokenCombinations = combinations(allTokens, 4);
-        var numberOfCombinations = tokenCombinations.length;
+        const tokenCombinations = combinations(allTokens, 4);
+        numberOfCombinations = tokenCombinations.length;
 
-        for (var tokens of tokenCombinations) {
-            var possibilities = possibilitiesWithOlive(tokens, modifiers);
+        for (const tokens of tokenCombinations) {
+            const possibilities = possibilitiesWithOlive(tokens, modifiers, config.candles);
             if (hasWinningPossibility(config, possibilities)) {
                 winningPossibilities++;
             }
-            for (var i = 0; i < fulfillsPredictions.length; i++) {
+            for (let i = 0; i < fulfillsPredictions.length; i++) {
                 if (canFulfillPrediction(config, possibilities, i)) {
                     fulfillsPredictions[i]++;
                 }
@@ -209,23 +246,23 @@ function calculateProbabilities(config, bag) {
 
     if (config.jacqueline && config.olive) {
         // first draw three tokens with Olive
-        var oliveTokenCombinations = combinations(allTokens, 3);
+        const oliveTokenCombinations = combinations(allTokens, 3);
 
-        var oliveAndJacquelineTokens = [];
-        for (var oliveTokens of oliveTokenCombinations) {
+        const oliveAndJacquelineTokens = [];
+        for (const oliveTokens of oliveTokenCombinations) {
             // then draw three tokens with Jacqueline
-            var newBag = removeFromBag(allTokens, oliveTokens);
-            var jacquelineTokens = combinations(newBag, 3, oliveTokens);
+            const newBag = removeFromBag(allTokens, oliveTokens);
+            const jacquelineTokens = combinations(newBag, 3, oliveTokens);
             oliveAndJacquelineTokens.push(...jacquelineTokens);
         }
-        var numberOfCombinations = oliveAndJacquelineTokens.length;
+        numberOfCombinations = oliveAndJacquelineTokens.length;
 
-        for (var tokens of oliveAndJacquelineTokens) {
-            var possibilities = possibilitiesWithOliveAndJacqueline(tokens, modifiers);
+        for (const tokens of oliveAndJacquelineTokens) {
+            const possibilities = possibilitiesWithOliveAndJacqueline(tokens, modifiers, config.candles);
             if (hasWinningPossibility(config, possibilities)) {
                 winningPossibilities++;
             }
-            for (var i = 0; i < fulfillsPredictions.length; i++) {
+            for (let i = 0; i < fulfillsPredictions.length; i++) {
                 if (canFulfillPrediction(config, possibilities, i)) {
                     fulfillsPredictions[i]++;
                 }

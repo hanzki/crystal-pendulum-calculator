@@ -45,15 +45,6 @@ function calculatorComponent() {
             this.result = calculateProbabilities(this.config, this.chaosBag);
             updateChart(this.result);
         },
-        isTentacles(token) {
-            return token === 'tentacles';
-        },
-        isSymbol(token) {
-            return ['tentacles','star','tablet','cultist','skull'].includes(token);
-        },
-        isNumber(token) {
-            return ['minus_four','minus_three','minus_two','minus_one','zero','plus_one'].includes(token);
-        },
         get prettyResult() {
             return (this.result?.winning * 100).toFixed(2) + '%'; 
         },
