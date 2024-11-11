@@ -1,42 +1,3 @@
-var DIFFICULTY = 3;
-var SKILL = 5;
-var JACQUELINE_ENABLED = false;
-var OLIVE_ENABLED = false;
-var CANDLES = 0;
-
-/*
-// Function to calculate all possible sets of tokens of size n that can be drawn from the bag
-function combinations(bag, n, prior = []) {
-    if (n === 0) {
-        return [prior];
-    }
-
-    // sum of tokens remaining in the bag
-    var sum = 0;
-    for (var key in bag) {
-        sum += bag[key];
-    }
-    if(sum < n) {
-        return [];
-    }
-
-    var key = Object.keys(bag)[0];
-    var newBag = Object.assign({}, bag);
-    newBag[key]--;
-    if (newBag[key] === 0) {
-        delete newBag[key];
-    }
-    // copy prior array
-    newPrior = prior.slice();
-
-    // pick the token
-    var result = combinations(newBag, n - 1, newPrior.concat([key]));
-    // don't pick the token
-    result = result.concat(combinations(newBag, n, prior));
-    return result;
-}
-    */
-
 // function to remove tokens from the bag
 function removeFromBag(bag, tokens) {
     var newBag = Object.assign({}, bag);
@@ -152,9 +113,9 @@ function possibilitiesWithOliveAndJacqueline(tokens, modifiers) {
 }
 
 // function to check if there is a winning possibility in the given modifiers
-function hasWinningPossibility(possibilities) {
+function hasWinningPossibility(config, possibilities) {
     for (var i = 0; i < possibilities.length; i++) {
-        if (possibilities[i] + SKILL >= DIFFICULTY) {
+        if (possibilities[i] + config.skill >= config.difficulty) {
             return true;
         }
     }
@@ -162,16 +123,16 @@ function hasWinningPossibility(possibilities) {
 }
 
 // function to check if the possibilities can fulfill the given crystal pendulum prediction
-function canFulfillPrediction(possibilities, prediction) {
+function canFulfillPrediction(config, possibilities, prediction) {
     for (var i = 0; i < possibilities.length; i++) {
-        if (Math.abs(possibilities[i] + SKILL - DIFFICULTY) === prediction) {
+        if (Math.abs(possibilities[i] + config.skill - config.difficulty) === prediction) {
             return true;
         }
     }
     return false;
 }
 
-function calculateProbabilities(bag) {
+function calculateProbabilities(config, bag) {
     var winningPossibilities = 0;
     var fulfillsPredictions = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
@@ -186,10 +147,10 @@ function calculateProbabilities(bag) {
         return acc;
     }, {});
 
-    console.log(`Calculating probabilities... [Difficulty: ${DIFFICULTY}, Skill: ${SKILL}, Jacqueline: ${JACQUELINE_ENABLED}, Olive: ${OLIVE_ENABLED}]`);
+    console.log(`Calculating probabilities... Config: ${JSON.stringify(config)}`);
     console.log({allTokens, modifiers});
 
-    if (!JACQUELINE_ENABLED && !OLIVE_ENABLED) {
+    if (!config.jacqueline && !config.olive) {
         // draw one token
         var tokenCombinations = combinations(allTokens, 1);
         var numberOfCombinations = tokenCombinations.length;
@@ -199,54 +160,54 @@ function calculateProbabilities(bag) {
                 continue;
             }
             var possibilities = [modifiers[tokens[0]]];
-            if (hasWinningPossibility(possibilities)) {
+            if (hasWinningPossibility(config, possibilities)) {
                 winningPossibilities++;
             }
             for (var i = 0; i < fulfillsPredictions.length; i++) {
-                if (canFulfillPrediction(possibilities, i)) {
+                if (canFulfillPrediction(config, possibilities, i)) {
                     fulfillsPredictions[i]++;
                 }
             }
         }
     }
 
-    if (JACQUELINE_ENABLED && !OLIVE_ENABLED) {
+    if (config.jacqueline && !config.olive) {
         // draw three tokens
         var tokenCombinations = combinations(allTokens, 3);
         var numberOfCombinations = tokenCombinations.length;
 
         for (var tokens of tokenCombinations) {
             var possibilities = possibilitiesWithJacqueline(tokens, modifiers);
-            if (hasWinningPossibility(possibilities)) {
+            if (hasWinningPossibility(config, possibilities)) {
                 winningPossibilities++;
             }
             for (var i = 0; i < fulfillsPredictions.length; i++) {
-                if (canFulfillPrediction(possibilities, i)) {
+                if (canFulfillPrediction(config, possibilities, i)) {
                     fulfillsPredictions[i]++;
                 }
             }
         }
     }
 
-    if (OLIVE_ENABLED && !JACQUELINE_ENABLED) {
+    if (config.olive && !config.jacqueline) {
         // draw four tokens
         var tokenCombinations = combinations(allTokens, 4);
         var numberOfCombinations = tokenCombinations.length;
 
         for (var tokens of tokenCombinations) {
             var possibilities = possibilitiesWithOlive(tokens, modifiers);
-            if (hasWinningPossibility(possibilities)) {
+            if (hasWinningPossibility(config, possibilities)) {
                 winningPossibilities++;
             }
             for (var i = 0; i < fulfillsPredictions.length; i++) {
-                if (canFulfillPrediction(possibilities, i)) {
+                if (canFulfillPrediction(config, possibilities, i)) {
                     fulfillsPredictions[i]++;
                 }
             }
         }
     }
 
-    if (JACQUELINE_ENABLED && OLIVE_ENABLED) {
+    if (config.jacqueline && config.olive) {
         // first draw three tokens with Olive
         var oliveTokenCombinations = combinations(allTokens, 3);
 
@@ -261,11 +222,11 @@ function calculateProbabilities(bag) {
 
         for (var tokens of oliveAndJacquelineTokens) {
             var possibilities = possibilitiesWithOliveAndJacqueline(tokens, modifiers);
-            if (hasWinningPossibility(possibilities)) {
+            if (hasWinningPossibility(config, possibilities)) {
                 winningPossibilities++;
             }
             for (var i = 0; i < fulfillsPredictions.length; i++) {
-                if (canFulfillPrediction(possibilities, i)) {
+                if (canFulfillPrediction(config, possibilities, i)) {
                     fulfillsPredictions[i]++;
                 }
             }

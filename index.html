@@ -23,20 +23,20 @@
         <h1>Jacqueline's little helper</h1>
         <div x-data="calculatorComponent()">
             <label>
-                Skill = <span x-text="skill"></span>
-                <input x-model.number="skill" type="range" max="15"/>
+                Skill = <span x-text="config.skill"></span>
+                <input x-model.number="config.skill" type="range" max="15"/>
             </label>
             <label>
-                Difficulty = <span x-text="difficulty"></span>
-                <input x-model.number="difficulty" type="range" max="15"/>
+                Difficulty = <span x-text="config.difficulty"></span>
+                <input x-model.number="config.difficulty" type="range" max="15"/>
             </label>
             <fieldset>
                 <label>
-                    <input x-model="jacqueline" name="jacueline" type="checkbox" role="switch" />
+                    <input x-model="config.jacqueline" name="jacueline" type="checkbox" role="switch" />
                     Use Jacqueline
                 </label>
                 <label>
-                    <input x-model="olive" name="olive" type="checkbox" role="switch" />
+                    <input x-model="config.olive" name="olive" type="checkbox" role="switch" />
                     Use Olive
                 </label>
                 <label>
@@ -47,11 +47,11 @@
             </fieldset>
             <fieldset>
                 <legend>Ritual Candles</legend>
-                <input type="radio" id="candles_zero" name="ritualCandles" checked />
+                <input type="radio" id="candles_zero" value="0" name="candles" x-model.number="config.candles" checked />
                 <label htmlFor="candles_zero">0</label>
-                <input type="radio" id="candles_one" name="ritualCandles" disabled/>
+                <input type="radio" id="candles_one" value="1" name="candles" x-model.number="config.candles"/>
                 <label htmlFor="candles_one">1</label>
-                <input type="radio" id="candles_two" name="ritualCandles" disabled/>
+                <input type="radio" id="candles_two" value="2" name="candles" x-model.number="config.candles"/>
                 <label htmlFor="candles_two">2</label>
             </fieldset>
             <details id="chaosBagDetails">

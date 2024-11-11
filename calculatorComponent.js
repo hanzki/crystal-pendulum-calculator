@@ -22,7 +22,7 @@ function calculatorComponent() {
         }
     };
 
-    const setChartData = (probabilities) => {
+    const updateChart = (probabilities) => {
         chart.data.datasets[0].data = probabilities.predictions;
         chart.update();
     };
@@ -32,27 +32,18 @@ function calculatorComponent() {
         init() {
             chart = new Chart(this.$refs.chart, initialCrystalPendulumChart);
         },
-        skill: 5,
-        difficulty: 3,
-        olive: false,
-        jacqueline: true,
+        config: {
+            skill: 5,
+            difficulty: 3,
+            olive: false,
+            jacqueline: true,
+            candles: 0,
+        },
         result: undefined,
         chaosBag: new ChaosBag(),
         calculate() {
-            SKILL = this.skill;
-            DIFFICULTY = this.difficulty;
-            JACQUELINE_ENABLED = this.jacqueline;
-            OLIVE_ENABLED = this.olive;
-            this.result = calculateProbabilities(this.chaosBag);
-            setChartData(this.result);
-        },
-        updateChaosBag() {
-            Object.keys(this.chaosBag).foreach(key => {
-                CHAOS_BAG[key] = this.chaosBag[key].count;
-                if (key !== 'tentacles') {
-                    MODIFIERS[key] = this.chaosBag[key].modifier;
-                }
-            });
+            this.result = calculateProbabilities(this.config, this.chaosBag);
+            updateChart(this.result);
         },
         isTentacles(token) {
             return token === 'tentacles';
